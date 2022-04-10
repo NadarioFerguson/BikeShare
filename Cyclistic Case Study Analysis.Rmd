@@ -1,0 +1,225 @@
+---
+title: 'Cyclistic Case Study: Bike Sharing'
+author: "Nadario Ferguson"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(janitor)
+library(dplyr)
+library(tidyr)
+library(geosphere)
+```
+
+## Step 1: Collect The Data
+
+```{r}
+March_Trips21 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202103-divvy-tripdata.csv")
+April_Trips21 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202104-divvy-tripdata.csv")
+May_Trips21 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202105-divvy-tripdata.csv")
+June_Trips21 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202106-divvy-tripdata.csv")
+July_Trips21 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202107-divvy-tripdata.csv")
+August_Trips21 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202108-divvy-tripdata.csv")
+September_Trips21 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202109-divvy-tripdata.csv")
+October_Trips21 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202110-divvy-tripdata.csv")
+November_Trips21 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202111-divvy-tripdata.csv")
+December_Trips21 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202112-divvy-tripdata.csv")
+January_Trips22 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202201-divvy-tripdata.csv")
+February_Trips22 <- read_csv("/Users/nadarioferguson/Desktop/Data Analytics Case Study/Case Study 1 - Cyclistic/Dataset Information/202202-divvy-tripdata.csv")
+```
+## Convert ride_id and rideable_type to character to be used correctly
+
+```{r}
+March_Trips21 <- mutate(March_Trips21, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+April_Trips21 <- mutate(April_Trips21, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+May_Trips21 <- mutate(May_Trips21, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+June_Trips21 <- mutate(June_Trips21, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+July_Trips21 <- mutate(July_Trips21, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+August_Trips21 <- mutate(August_Trips21, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+September_Trips21 <- mutate(September_Trips21, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+October_Trips21 <- mutate(October_Trips21, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+November_Trips21 <- mutate(November_Trips21, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+December_Trips21 <- mutate(December_Trips21, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+January_Trips22 <- mutate(January_Trips22, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+February_Trips22 <- mutate(February_Trips22, ride_id = as.character(ride_id), rideable_type = as.character(rideable_type))
+```
+
+## Combine all dataframes together into 1
+
+```{r}
+All_Tripsv1 <- bind_rows(March_Trips21, April_Trips21, May_Trips21, June_Trips21, July_Trips21, August_Trips21, September_Trips21, October_Trips21, November_Trips21, December_Trips21, January_Trips22, February_Trips22)
+```
+
+## Add ride_length calcualtions to Dataframe
+
+```{r}
+All_Tripsv1$ride_length <- difftime(All_Tripsv1$ended_at, All_Tripsv1$started_at)
+```
+
+## Organize the data format and  add a ride_length column
+
+```{r}
+All_Tripsv1$date <- as.Date(All_Tripsv1$started_at)
+All_Tripsv1$month <- format(as.Date(All_Tripsv1$date), "%m")
+All_Tripsv1$day <- format(as.Date(All_Tripsv1$date), "%d")
+All_Tripsv1$year <- format(as.Date(All_Tripsv1$date), "%Y")
+All_Tripsv1$day_of_week <- format(as.Date(All_Tripsv1$date), "%A")
+```
+
+## Check for NA's
+
+```{r}
+sum(is.na(All_Tripsv1))
+```
+
+## Remove NA's
+
+```{r}
+All_Trips_Clean <- na.omit(All_Tripsv1)
+```
+
+## Convert ridelength to hour
+
+```{r}
+All_Trips_Clean$ride_length_hr <- round(All_Trips_Clean$ride_length/3600, 2)
+```
+
+## Convert ride_length to numeric value
+
+```{r}
+All_Trips_Clean$ride_length <- as.numeric(as.character(All_Trips_Clean$ride_length))
+is.numeric(All_Trips_Clean$ride_length)
+```
+## Calculate distance
+
+```{r}
+All_Trips_Clean$distHaversine <- round(distHaversine(All_Trips_Clean[,c("start_lng", "start_lat")], All_Trips_Clean[,c("end_lng", "end_lat")])/1609.344, 3)
+```
+
+## Reassign labels
+
+```{r}
+All_Trips_Clean <- All_Trips_Clean %>% 
+  mutate(member_casual = recode(member_casual, "Subscriber" = "member", "Customer" = "Casual"))
+```
+
+## Removing negative values to create a cleaner dataframe
+
+```{r}
+All_Trips_Clean <- All_Trips_Clean[!(All_Trips_Clean$ride_length < 0),]
+
+
+```
+
+#Phase 4: Analysis
+
+Calculating Statistical Essentials
+
+Calculate the mean, median, maximum and minimum values of cleaned DF
+
+```{r}
+mean(All_Trips_Clean$ride_length)
+median(All_Trips_Clean$ride_length)
+max(All_Trips_Clean$ride_length)
+min(All_Trips_Clean$ride_length)
+```
+
+Data Aggregation - Compare the member and casual users
+
+```{r}
+aggregate(All_Trips_Clean$ride_length ~ All_Trips_Clean$member_casual, FUN = mean)
+aggregate(All_Trips_Clean$ride_length ~ All_Trips_Clean$member_casual, FUN = median)
+aggregate(All_Trips_Clean$ride_length ~ All_Trips_Clean$member_casual, FUN = max)
+aggregate(All_Trips_Clean$ride_length ~ All_Trips_Clean$member_casual, FUN = min)
+```
+
+Calculate the average ride time by each day for members vs casual users
+
+```{r}
+aggregate(All_Trips_Clean$ride_length ~ All_Trips_Clean$member_casual + All_Trips_Clean$day_of_week, FUN = mean)
+```
+
+Calculate the average distance by each day for members vs casual users
+
+```{r}
+aggregate(All_Trips_Clean$distHaversine ~ All_Trips_Clean$member_casual + All_Trips_Clean$day_of_week, FUN = mean)
+```
+
+
+Analysis
+
+Organize the days of the week
+
+```{r}
+All_Trips_Clean$day_of_week <- ordered(All_Trips_Clean$day_of_week, levels = c("Sunday", "Monday", "Tuesday", "Wedneday", "Thursday", "Friday", "Saturday"))
+```
+
+
+Analyze the bike-share data by type and weekday
+
+```{r}
+All_Trips_Clean %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(number_of_rides = n(), average_duration = mean(ride_length), average_distance = mean(distHaversine)) %>% 
+  arrange(member_casual, weekday)
+```
+
+##Phase 5: Share
+
+Visualizing the number of rides by rider type
+
+```{r}
+All_Trips_Clean %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(number_of_rides = n(), average_duration = mean(ride_length), average_distance = mean(distHaversine)) %>% 
+  arrange(member_casual, weekday) %>% 
+  ggplot(aes(x = weekday, y = number_of_rides, fill = member_casual)) + geom_col(position = "dodge")
+```
+Create a visualization for average duration
+
+```{r}
+All_Trips_Clean %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(number_of_rides = n(), average_duration = mean(ride_length)) %>% 
+  arrange(member_casual, weekday) %>% 
+  ggplot(aes(x = weekday, y = average_duration, fill = member_casual)) + geom_col(position = "dodge")
+```
+
+Create a visualization for average duration
+
+```{r}
+All_Trips_Clean %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(number_of_rides = n(), average_distance = mean(distHaversine)) %>% 
+  arrange(member_casual, weekday) %>% 
+  ggplot(aes(x = weekday, y = average_distance, fill = member_casual)) + geom_col(position = "dodge")
+```
+
+Duration vs Distrance Line Graph for member vs casual users
+
+```{r}
+ggplot(filter(All_Trips_Clean, All_Trips_Clean$ride_length<600)) +
+  geom_histogram(mapping = aes(x = ride_length)) +
+  facet_wrap(~member_casual)
+```
+
+Phase 6: Act
+
+During this phase we methodically go through our data problem and the analysis we made to make a data-driven decision.
+
+What does the data tells us?
+
+We can clearly see that membership users are consistent throughout the weekdays and then decline during the weekend. This is the complete opposite for casual users. Additionally, casual users have a much higher duration time than members. With this, my recommendation to my manager, would be to introduce a price structure that placese emphasis on duration vs the number of rides. The pricing structure should reward membership with a longer allotted time.This would incentivize casual users to purchase memberships if it rewarded them with a longer time to use the bike for a cheaper cost than not being within the membership.
+
+
