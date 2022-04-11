@@ -44,6 +44,32 @@ We will be using the dataset supplied by the Google Data Analytics Certification
 
 ### Data Cleaning Log
 
-A review of my data wrangling and cleaning process can be reviewed here 
+A review of my data wrangling and cleaning process can be reviewed here
+
+### Analysis
+
+After cleaning and organizing the data we were able to analyze the information provided and found a few interesting observations.
+
+#### Number Of Rides Per Day By Usertype
+![Number Of Rides By Week Day](https://user-images.githubusercontent.com/63158066/162659393-95ae4027-fa58-461c-929d-3787739beca9.png)
+
+Here we can see that members consistently utilize their subscription throughoutthe week and into the weekend. However, casual users have a low utilization rate throughout the weekday and experience a spike on the weekends.
+
+
+#### Average Duration Of Rides By Usertype
+
+![Average Duration Of Rides By Usertype](https://user-images.githubusercontent.com/63158066/162659698-22157e13-5126-4bbe-b19e-53d21ebffdd9.png)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
