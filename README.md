@@ -44,7 +44,7 @@ We will be using the dataset supplied by the Google Data Analytics Certification
 
 #### Data Cleaning Log
 
-A review of my data wrangling and cleaning process can be reviewed here
+A review of my data wrangling and cleaning process can be reviewed [here](https://github.com/NadarioFerguson/BikeShare/commit/1b6f103f8a071ae3318453182bc72d8b782343f9)
 
 ### Analysis
 
