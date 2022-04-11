@@ -6,7 +6,7 @@
 
 Published April 10, 2022
 
-Hello! I recently completed my Google Data Analytics Course, and would like to walk you through my approach using what I have learned, and how I have applied those skills in completing this capstone project.
+Hello! I recently completed my Google Data Analytics Course, and would like to walk you through my approach using what I have learned, and how I have applied those skills in completing this capstone project. For this project I utilized RProgramming for Data Wrangling, Visualization and Analysis.
 
 ### Scenario 
 
